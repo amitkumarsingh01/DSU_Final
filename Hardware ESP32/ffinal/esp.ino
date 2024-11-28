@@ -2,16 +2,18 @@
 #include <HTTPClient.h>
 
 // Wi-Fi credentials
-const char* ssid = "Lecture Hall 1";
-const char* password = "LectureHall1-SOE";
+const char* ssid = "Project";
+const char* password = "12345678";
 
 // Server URLs
 const char* captureServer = "http://192.168.54.58:5000/capture";   // Raspberry Pi's server for image capture
 const char* stateServer = "http://192.168.54.200:5000/update";       // Server for sending switch state updates
+const char* audioServer = "http://192.168.54.200:5000/audio_chain";
 
 // Pin configuration
 #define SWITCH_PIN 13        // Pin for the switch
-#define BUTTON_PIN 12         // Pin for image capture button
+#define BUTTON_PIN 27         // Pin for image capture button
+#define AUDIO_PIN 14
 const int trigPin = 5;       // Trigger pin of the ultrasonic sensor
 const int echoPin = 18;      // Echo pin of the ultrasonic sensor
 const int buzzerPin = 15;    // Pin connected to the buzzer
@@ -34,6 +36,7 @@ void setup() {
   // Pin mode setup
   pinMode(SWITCH_PIN, INPUT_PULLUP);   // Set switch pin as input with pull-up
   pinMode(BUTTON_PIN, INPUT_PULLUP);   // Set button pin as input with pull-up
+  pinMode(AUDIO_PIN, INPUT_PULLUP);
   pinMode(trigPin, OUTPUT);            // Set ultrasonic trigger pin as output
   pinMode(echoPin, INPUT);             // Set ultrasonic echo pin as input
   pinMode(buzzerPin, OUTPUT);          // Set buzzer pin as output
@@ -75,6 +78,13 @@ void loop() {
     delay(1000);  // Debounce delay to prevent multiple triggers
   }
 
+  if (digitalRead(AUDIO_PIN) == LOW) {
+    Serial.println("Button pressed, sending audio request...");
+    sendAudioCaptureRequest();
+    
+    delay(1000);  // Debounce delay to prevent multiple triggers
+  }
+
   // Handle ultrasonic sensor and buzzer
   handleUltrasonicSensor();
   
@@ -106,15 +116,15 @@ void handleUltrasonicSensor() {
   // If distance is within 100cm, buzz the buzzer
   if (distance < 100 && distance >= 2) {
     delayTime = map(distance, 2, 100, 200, 400); // Map distance to delay time between 200 and 400 ms
-    digitalWrite(buzzerPin, HIGH); // Turn the buzzer on
+    digitalWrite(buzzerPin, LOW); // Turn the buzzer on
 
     // Control the buzzer's on-off timing
     if (currentTime - previousTime >= delayTime) {
-      digitalWrite(buzzerPin, LOW); // Turn the buzzer off
+      digitalWrite(buzzerPin, HIGH); // Turn the buzzer off
       previousTime = currentTime;   // Reset the timer
     }
   } else {
-    digitalWrite(buzzerPin, LOW);  // Turn off the buzzer if distance exceeds 100 cm
+    digitalWrite(buzzerPin, HIGH);  // Turn off the buzzer if distance exceeds 100 cm
   }
 }
 
@@ -149,6 +159,26 @@ void sendImageCaptureRequest() {
     int httpResponseCode = http.POST("");  // Send HTTP POST request
     if (httpResponseCode == 200) {
       Serial.println("Image capture request sent successfully");
+    } else {
+      Serial.print("Error: ");
+      Serial.println(httpResponseCode);
+    }
+
+    http.end();  // Close connection
+  } else {
+    Serial.println("Error in WiFi connection");
+  }
+}
+
+// Function to send an audio capture request to the Raspberry Pi
+void sendAudioCaptureRequest() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(audioServer);  // Specify the server URL
+
+    int httpResponseCode = http.POST("");  // Send HTTP POST request
+    if (httpResponseCode == 200) {
+      Serial.println("Audio capture request sent successfully");
     } else {
       Serial.print("Error: ");
       Serial.println(httpResponseCode);

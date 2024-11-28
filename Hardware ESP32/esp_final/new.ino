@@ -2,8 +2,8 @@
 #include <HTTPClient.h>
 
 // Wi-Fi credentials
-const char* ssid = "Lecture Hall 1";
-const char* password = "LectureHall1-SOE";
+const char* ssid = "Project";
+const char* password = "12345678";
 
 // Server URLs
 const char* captureServer = "http://192.168.54.58:5000/capture";   // Raspberry Pi's server for image capture
@@ -11,7 +11,7 @@ const char* stateServer = "http://192.168.54.200:5000/update";       // Server f
 
 // Pin configuration
 #define SWITCH_PIN 13        // Pin for the switch
-#define BUTTON_PIN 12         // Pin for image capture button
+#define BUTTON_PIN 27         // Pin for image capture button
 const int trigPin = 5;       // Trigger pin of the ultrasonic sensor
 const int echoPin = 18;      // Echo pin of the ultrasonic sensor
 const int buzzerPin = 15;    // Pin connected to the buzzer
@@ -106,15 +106,15 @@ void handleUltrasonicSensor() {
   // If distance is within 100cm, buzz the buzzer
   if (distance < 100 && distance >= 2) {
     delayTime = map(distance, 2, 100, 200, 400); // Map distance to delay time between 200 and 400 ms
-    digitalWrite(buzzerPin, HIGH); // Turn the buzzer on
+    digitalWrite(buzzerPin, LOW); // Turn the buzzer on
 
     // Control the buzzer's on-off timing
     if (currentTime - previousTime >= delayTime) {
-      digitalWrite(buzzerPin, LOW); // Turn the buzzer off
+      digitalWrite(buzzerPin, HIGH); // Turn the buzzer off
       previousTime = currentTime;   // Reset the timer
     }
   } else {
-    digitalWrite(buzzerPin, LOW);  // Turn off the buzzer if distance exceeds 100 cm
+    digitalWrite(buzzerPin, HIGH);  // Turn off the buzzer if distance exceeds 100 cm
   }
 }
 

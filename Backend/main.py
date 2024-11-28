@@ -8,7 +8,7 @@ from gtts import gTTS
 
 app = Flask(__name__)
 
-save_directory = r'E:\Coding\DSU_DEVHACK\gemini\public'
+save_directory = r'C:\Users\aksml\Development\Hardware\Avishkar\DSU_Final\Backend\public'
 
 if not os.path.exists(save_directory):
     os.makedirs(save_directory)
@@ -64,8 +64,8 @@ def upload_image():
     tts = gTTS(text=response_text, lang='en')
     tts.save(output_audio_path)
 
-    audio_url = f'http://10.1.7.64:5000/audio/output.mp3'
-    text_url = f'http://10.1.7.64:5000/text/output.txt'
+    audio_url = f'http://192.168.54.200:5000/audio/output.mp3'
+    text_url = f'http://192.168.54.200:5000/text/output.txt'
 
     return jsonify({
         "message": "Image successfully processed.",
