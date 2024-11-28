@@ -12,7 +12,8 @@ import mimetypes
 
 app = Flask(__name__)
 
-save_directory = 'public/'
+save_directory = 'C://Users//aksml//Development//Hardware//Avishkar//DSU_Final//public'
+# save_directory = r'C:\Users\aksml\Development\Hardware\Avishkar\DSU_Final\Hardware ESP32\ffinal\public\audio.wav'
 laptop_host = '192.168.54.200'
 
 if not os.path.exists(save_directory):

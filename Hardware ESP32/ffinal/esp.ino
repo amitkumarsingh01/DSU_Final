@@ -8,7 +8,7 @@ const char* password = "12345678";
 // Server URLs
 const char* captureServer = "http://192.168.54.58:5000/capture";   // Raspberry Pi's server for image capture
 const char* stateServer = "http://192.168.54.200:5000/update";       // Server for sending switch state updates
-const char* audioServer = "http://192.168.54.200:5000/audio_chain";
+const char* audioServer = "http://192.168.54.58:5000/audio_chain";
 
 // Pin configuration
 #define SWITCH_PIN 13        // Pin for the switch
