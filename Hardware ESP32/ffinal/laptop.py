@@ -16,6 +16,8 @@ save_directory = 'C://Users//aksml//Development//Hardware//Avishkar//DSU_Final//
 # save_directory = r'C:\Users\aksml\Development\Hardware\Avishkar\DSU_Final\Hardware ESP32\ffinal\public\audio.wav'
 laptop_host = '192.168.54.200'
 
+id_file_path = os.path.join(save_directory, 'last_id.txt')
+
 if not os.path.exists(save_directory):
     os.makedirs(save_directory)
 
@@ -27,6 +29,25 @@ chat = model.start_chat(history=[])
 
 switch_state = False
 pygame.init()
+
+def get_next_id():
+    starting_id = 101
+
+    if not os.path.exists(id_file_path):
+        with open(id_file_path, 'w') as f:
+            f.write(str(starting_id - 1)) 
+
+    with open(id_file_path, 'r') as f:
+        last_id = int(f.read().strip())
+
+    next_id = last_id + 1
+    while os.path.exists(os.path.join(save_directory, f"{next_id}.jpg")):
+        next_id += 1
+
+    with open(id_file_path, 'w') as f:
+        f.write(str(next_id))
+
+    return next_id
 
 # Function to play audio when the state is toggled to True
 def play_audio():
@@ -92,7 +113,7 @@ def encode_image_to_base64(image_path):
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
-    new_id = random.randint(100000, 999999)
+    new_id = get_next_id()
     if 'image' not in request.files:
         return "No image file found in the request.", 400
 
@@ -141,7 +162,7 @@ def upload_image():
 
 @app.route('/text_chain', methods=['POST'])
 def audio_chain():
-    new_id = random.randint(100000, 999999)
+    new_id = get_next_id()
     data = request.get_json()
     print(data)
     if 'text' not in data:
